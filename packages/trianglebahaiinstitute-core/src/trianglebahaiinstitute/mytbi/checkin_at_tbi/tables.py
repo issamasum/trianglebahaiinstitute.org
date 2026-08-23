@@ -1,7 +1,7 @@
 # Copyright (c) 2026 Issa Masumbuko
 # SPDX-LIcence-Identifier: MIT
 
-"""Database-backed event models"""
+"""Database-backed checkin at TBI models"""
 
 import enum
 from datetime import datetime
@@ -10,7 +10,7 @@ from sqlalchemy import ARRAY, Column, DateTime, ForeignKey, Integer, String, fun
 from sqlmodel import Enum, Field, SQLModel
 
 
-class StatusType(str, enum.Enum):
+class EventStatus(str, enum.Enum):
     """Defines an event's status."""
 
     ACTIVE = "active"
@@ -18,12 +18,23 @@ class StatusType(str, enum.Enum):
     CANCELED = "canceled"
 
 
-class CreationType(str, enum.Enum):
+class EventCreationType(str, enum.Enum):
     """ Defines how an event was created."""
 
     MANUAL = "manual"
-    SYNCHED = "synced"
+    SYNCED = "synced"
     SYSTEM = "system"
+
+class DietaryPreference(str, enum.Enum):
+    """Defines various options for dietary preferences."""
+
+    VEGETARIAN = "vegetarian"
+    VEGAN = "vegan"
+    GLUTEN_FREE = "gluten_free"
+    DAIRY_FREE = "dairy_free"
+    HALAL = "halal"
+    KOSHER = "kosher"
+    OTHER = "other"
 
 
 
@@ -50,24 +61,27 @@ class Event(SQLModel, table=True):
         ),
         default=None
     )
-    status: StatusType = Field(
+    status: EventStatus = Field(
         sa_column=Column(
             Enum(
-                StatusType,
+                EventStatus,
                 values_callable=lambda e: [m.value for m in e]),
-                nullable=True,
-            )
+                nullable=False,
+            ),
+            default=EventStatus.ACTIVE.value
+       
     )
     publish: bool = Field(
         default=True
     )
-    creation_type: CreationType =  Field(
+    creation_type: EventCreationType =  Field(
         sa_column=Column(
             Enum(
-                CreationType,
+             EventCreationType,
                 values_callable=lambda e: [m.value for m in e]),
-                nullable=True,
-            )
+                nullable=False,
+            ),
+            default=EventCreationType.MANUAL.value
     )
     external_calender_id: str = Field(
         sa_column=Column(String, nullable=True),
@@ -99,7 +113,7 @@ class Event(SQLModel, table=True):
     )
 
 
-class Checkins(SQLModel, table=True):
+class CheckIn(SQLModel, table=True):
     """Represents a checked in visitor at the Triangle Baha'i Institute."""
 
     id: int = Field(
@@ -110,8 +124,12 @@ class Checkins(SQLModel, table=True):
     )
     age: int = Field(nullable=True)
     meal: bool = Field(default=False)
-    dietary_preferences: list[str] = Field(
-        sa_column=Column(ARRAY(String), nullable=True),
+    dietary_preferences: list[DietaryPreference] = Field(
+        sa_column=Column(
+            ARRAY(
+                Enum(DietaryPreference, values_callable=lambda e: [m.value for m in e])
+                ), 
+                nullable=True),
         default_factory=list,
     )
     allergies: str = Field(nullable=True)
@@ -123,7 +141,7 @@ class Checkins(SQLModel, table=True):
     )
     user_id: int = Field(
             sa_column=Column(
-                Integer, ForeignKey("user.id"), nullable=False
+                Integer, ForeignKey("user.id"), nullable=True
                 )
         )
     checked_in_at: datetime = Field(
