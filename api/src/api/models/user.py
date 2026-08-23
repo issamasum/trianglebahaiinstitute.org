@@ -5,14 +5,11 @@
 
 from datetime import datetime
 from typing import Optional
-from enum import Enum
+
+from trianglebahaiinstitute.tables.user import UserRole
 
 from pydantic import BaseModel, EmailStr
 
-class UserRole(str, Enum):
-    """An assinged user role."""
-
-    COORDINATOR = "coordinator"
 
 
 class UserSignUp(BaseModel):

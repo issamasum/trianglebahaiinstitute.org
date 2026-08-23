@@ -5,39 +5,11 @@
 
 from datetime import datetime
 from typing import Optional
-from enum import Enum
+
+
+from trianglebahaiinstitute.mytbi.checkin_at_tbi.tables import EventStatus, EventCreationType, DietaryPreference
 
 from pydantic import BaseModel
-
-
-# ----Enums-----------
-
-class EventStatus(str, Enum):
-    """Defines an event's status."""
-
-    ACTIVE = "active"
-    ENDED = "ended"
-    CANCELED = "canceled"
-
-
-class EventCreationType(str, Enum):
-    """ Defines how an event was created."""
-
-    MANUAL = "manual"
-    SYNCED = "synced"
-    SYSTEM = "system"
-
-class DietaryPreference(str, Enum):
-    """Defines various options for dietary preferences."""
-
-    VEGETARIAN = "vegetarian"
-    VEGAN = "vegan"
-    GLUTEN_FREE = "gluten_free"
-    DAIRY_FREE = "dairy_free"
-    HALAL = "halal"
-    KOSHER = "kosher"
-    OTHER = "other"
-
 
 
 # -----Events----------
@@ -81,13 +53,13 @@ class EventResponse(BaseModel):
 # -----Checkins---------
 
 
-class CreateGeneralCheckinRequest(BaseModel):
+class CreateGeneralCheckInRequest(BaseModel):
     """Payload for a general check in not associated with an event."""
 
     purpose: str
 
 
-class CreateCheckinRequest(BaseModel):
+class CreateCheckInRequest(BaseModel):
     """Payload for checking in at the TBI."""
 
     visitor_name: str
@@ -97,7 +69,7 @@ class CreateCheckinRequest(BaseModel):
     allergies: Optional[str] = None
 
 
-class UpdateCheckinRequest(BaseModel):
+class UpdateCheckInRequest(BaseModel):
     """Payload for checking in at the TBI."""
 
     visitor_name: Optional[str] = None
@@ -107,7 +79,7 @@ class UpdateCheckinRequest(BaseModel):
     allergies: Optional[str] = None
 
 
-class CheckinResponse(BaseModel):
+class CheckInResponse(BaseModel):
     """Payload for checking in at the TBI."""
 
     id: int

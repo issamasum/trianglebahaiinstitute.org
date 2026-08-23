@@ -113,7 +113,7 @@ class Event(SQLModel, table=True):
     )
 
 
-class Checkins(SQLModel, table=True):
+class CheckIn(SQLModel, table=True):
     """Represents a checked in visitor at the Triangle Baha'i Institute."""
 
     id: int = Field(
