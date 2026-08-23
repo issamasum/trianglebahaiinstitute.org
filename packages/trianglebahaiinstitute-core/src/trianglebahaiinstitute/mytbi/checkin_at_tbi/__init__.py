@@ -1,4 +1,4 @@
-# Copyright (c) 2026 Kris Jordan
+# Copyright (c) 2026 Issa Masumbuko
 # SPDX-License-Identifier: MI
 
 """Check-in at TBI models, tables, and serivce."""
