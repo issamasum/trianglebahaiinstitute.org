@@ -10,7 +10,6 @@ import jwt
 from pwdlib import PasswordHash
 from pydantic import EmailStr
 
-from ..auth import verify_jwt
 from ..config import Settings
 from ..repositories.user_repository import UserRepository
 from ..tables.user import User
@@ -237,6 +236,8 @@ class AuthService:
         Raises:
             AuthenticationException: If the token is invalid or expired.
         """
+        from ..auth import verify_jwt
+        
         return verify_jwt(token, self._settings)
 
     def get_user_by_id(self, user_id: UUID) -> User | None:
