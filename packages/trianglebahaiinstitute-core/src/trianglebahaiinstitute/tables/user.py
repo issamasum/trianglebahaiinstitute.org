@@ -4,9 +4,10 @@
 """Database-backed user models"""
 
 import enum
+import uuid
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Integer, func
+from sqlalchemy import Column, DateTime, Uuid, func
 from sqlmodel import Enum, Field, SQLModel
 
 
@@ -19,8 +20,9 @@ class UserRole(str, enum.Enum):
 class User(SQLModel, table=True):
     """Represents an authenticated user using featured requiring authentication."""
 
-    id: int = Field(
-        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        sa_column=Column(Uuid, primary_key=True)
     )
     first_name: str = Field(
         nullable=False
@@ -35,7 +37,7 @@ class User(SQLModel, table=True):
         nullable=False, unique=True
     )
     password_hash: str = Field(
-       nullable=False 
+       nullable=True 
     )
     role: UserRole = Field(
         sa_column=Column(
