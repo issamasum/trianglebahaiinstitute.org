@@ -2,9 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 from .user import (
-    UserLogin,
+    UserLoginRequest,
     UserProfile,
-    UserSignUp,
+    UserSignUpRequest,
+    UpdateProfileRequest,
+    TokenResponse,
 )
 
 from .check_in_at_tbi import (
@@ -15,12 +17,15 @@ from .check_in_at_tbi import (
     CreateCheckInRequest,
     UpdateCheckInRequest,
     CreateGeneralCheckInRequest,
+    
 )
 
 __all__ = [
-    "UserLogin",
+    "UserLoginRequest",
     "UserProfile",
-    "UserSignUp",
+    "UserSignUpRequest",
+    "TokenResponse",
+    "UpdateProfileRequest",
     "EventResponse",
     "CreateEventRequest",
     "UpdateEventRequest",
