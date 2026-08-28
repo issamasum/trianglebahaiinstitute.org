@@ -40,7 +40,7 @@ def create_db_and_tables() -> None:
 def load_table_metadata() -> None:
     """Imports SQLModel table modules so their metadata is registered."""
     import_module("trianglebahaiinstitute.tables")
-    import_module("trianglebahaiinstitute.mytbi.chekin_at_tbi.tables")
+    import_module("trianglebahaiinstitute.mytbi.checkin_at_tbi.tables")
    
 
 

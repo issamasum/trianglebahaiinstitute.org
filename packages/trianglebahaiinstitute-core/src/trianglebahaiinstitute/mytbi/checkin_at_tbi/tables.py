@@ -4,9 +4,10 @@
 """Database-backed checkin at TBI models"""
 
 import enum
+import uuid
 from datetime import datetime
 
-from sqlalchemy import ARRAY, Column, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import ARRAY, Column, DateTime, ForeignKey, Integer, String, Uuid, func
 from sqlmodel import Enum, Field, SQLModel
 
 
@@ -25,6 +26,7 @@ class EventCreationType(str, enum.Enum):
     SYNCED = "synced"
     SYSTEM = "system"
 
+
 class DietaryPreference(str, enum.Enum):
     """Defines various options for dietary preferences."""
 
@@ -35,7 +37,6 @@ class DietaryPreference(str, enum.Enum):
     HALAL = "halal"
     KOSHER = "kosher"
     OTHER = "other"
-
 
 
 class Event(SQLModel, table=True):
@@ -88,11 +89,11 @@ class Event(SQLModel, table=True):
         default=None,
     
     )
-    created_by: int = Field(
-        sa_column=Column(Integer, ForeignKey("user.id"), nullable=False)
+    created_by: uuid.UUID = Field(
+        sa_column=Column(Uuid, ForeignKey("user.id"), nullable=False)
     )
-    updated_by: int = Field(
-            sa_column=Column(Integer, ForeignKey("user.id"), nullable=False)
+    updated_by: uuid.UUID = Field(
+            sa_column=Column(Uuid, ForeignKey("user.id"), nullable=False)
         )
     created_at: datetime = Field(
         sa_column=Column(
@@ -122,7 +123,7 @@ class CheckIn(SQLModel, table=True):
     visitor_name: str = Field(
             nullable=False
     )
-    age: int = Field(nullable=True)
+    age: int | None = Field(nullable=True)
     meal: bool = Field(default=False)
     dietary_preferences: list[DietaryPreference] = Field(
         sa_column=Column(
@@ -132,16 +133,16 @@ class CheckIn(SQLModel, table=True):
                 nullable=True),
         default_factory=list,
     )
-    allergies: str = Field(nullable=True)
-    purpose: str = Field(nullable=True)
-    event_id: int = Field(
+    allergies: str | None = Field(nullable=True)
+    purpose: str | None = Field(nullable=True)
+    event_id: int | None = Field(
         sa_column=Column(
             Integer, ForeignKey("event.id"), nullable=True
             )
     )
-    user_id: int = Field(
+    user_id: uuid.UUID | None = Field(
             sa_column=Column(
-                Integer, ForeignKey("user.id"), nullable=True
+                Uuid, ForeignKey("user.id"), nullable=True
                 )
         )
     checked_in_at: datetime = Field(
