@@ -10,7 +10,7 @@ from fastapi import APIRouter, Body, HTTPException
 from ..di import AuthenticatedUserDI, UserRepositoryDI
 from ..models import UpdateProfileRequest, UserProfile
 
-router = APIRouter(prefix="/mytbi/me", tags=["Authentication"])
+router = APIRouter(prefix="/mytbi/me", tags=["Authenticated User"])
 
 
 @router.get(
@@ -22,7 +22,7 @@ router = APIRouter(prefix="/mytbi/me", tags=["Authentication"])
 )
 def get_current_subject_profile(subject: AuthenticatedUserDI) -> UserProfile:
     """Returns the authenticated user's profile.
- 
+
     Args:
         subject: Authenticated subject resolved from the bearer token.
 
@@ -30,8 +30,8 @@ def get_current_subject_profile(subject: AuthenticatedUserDI) -> UserProfile:
         A UserProfile for the API.
     """
     return UserProfile.model_validate(subject.model_dump(mode="json"))
- 
- 
+
+
 @router.patch(
     "",
     response_model=UserProfile,
@@ -48,27 +48,27 @@ def update_current_subject_profile(
     user_repo: UserRepositoryDI,
 ) -> UserProfile:
     """Updates whichever fields are provided on the authenticated user's profile.
- 
+
     Fields omitted from the request body are left unchanged.
- 
+
     Args:
         subject: TAuthenticated subject resolved from the bearer token.
         body: Profile update payload.
         user_repo: Repository used to persist the change.
- 
+
     Returns:
         The updated user profile.
- 
+
     Raises:
         HTTPException: If the requested email is already taken by another user.
     """
     updates = body.model_dump(exclude_unset=True)
- 
+
     if "email" in updates and updates["email"] != subject.email:
         existing = user_repo.get_by_email(updates["email"])
         if existing is not None and existing.id != subject.id:
             raise HTTPException(status_code=409, detail="Email already in use.")
- 
+
     for field, value in updates.items():
         setattr(subject, field, value)
 

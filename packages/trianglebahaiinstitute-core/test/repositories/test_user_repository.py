@@ -11,9 +11,10 @@ from trianglebahaiinstitute.tables.user import User
 
 # -- get_by_email ---
 
+
 @pytest.mark.integration
 def test_get_by_email_returns_none_when_no_user_exists(session: Session) -> None:
-    #Arrange
+    # Arrange
     repo = UserRepository(session)
 
     # Act
@@ -22,16 +23,17 @@ def test_get_by_email_returns_none_when_no_user_exists(session: Session) -> None
     # Assert
     assert result is None
 
+
 @pytest.mark.integration
 def test_get_by_email_returns_user_when_exists(session: Session) -> None:
     # Arrange
     repo = UserRepository(session)
     user: User = User(
-           first_name="Test",
-           last_name="User",
-           phone="919-123-1234",
-           email="testuser@example.com"
-        )
+        first_name="Test",
+        last_name="User",
+        phone="919-123-1234",
+        email="testuser@example.com",
+    )
     session.add(user)
     session.flush()
 
@@ -43,23 +45,24 @@ def test_get_by_email_returns_user_when_exists(session: Session) -> None:
     assert result.id == user.id
     assert result.email == "testuser@example.com"
 
+
 # --- register_user ----
+
 
 @pytest.mark.integration
 def test_register_user_persists_and_returns_user(session: Session) -> None:
     # Arrange
     repo = UserRepository(session)
     user: User = User(
-               first_name="New",
-               last_name="User",
-               phone="919-132-1234",
-               email="newuser@example.com"
+        first_name="New",
+        last_name="User",
+        phone="919-132-1234",
+        email="newuser@example.com",
     )
 
- 
     # Act
     result = repo.register_user(user)
- 
+
     # Assert
     assert result.id is not None
     assert result.email == "newuser@example.com"
@@ -67,11 +70,13 @@ def test_register_user_persists_and_returns_user(session: Session) -> None:
     assert persisted is not None
     assert persisted.email == "newuser@example.com"
 
+
 # --- list_all ----
+
 
 @pytest.mark.integration
 def test_list_all_returns_empty_when_no_users(session: Session) -> None:
-    #Arrange
+    # Arrange
     repo = UserRepository(session)
 
     # Act
@@ -83,51 +88,77 @@ def test_list_all_returns_empty_when_no_users(session: Session) -> None:
 
 @pytest.mark.integration
 def test_list_returns_all_users(session: Session) -> None:
-   # Arrange
+    # Arrange
     repo = UserRepository(session)
-    session.add(User(
+    session.add(
+        User(
             first_name="Other",
             last_name="Person",
             phone="919-167-6767",
             email="otherperson@example.com",
-        ))
-    session.add(User(
+        )
+    )
+    session.add(
+        User(
             first_name="Other",
             last_name="User",
             phone="919-111-6776",
             email="otheruser@example.com",
-        ))
+        )
+    )
     session.flush()
- 
+
     # Act
     result = repo.list_all()
- 
+
     # Assert
     assert len(result) == 2
     emails = {user.email for user in result}
     assert emails == {"otherperson@example.com", "otheruser@example.com"}
 
+
 # ---update ----
+
 
 @pytest.mark.integration
 def test_update_user_persists_changes(session: Session) -> None:
-   # Arrange
+    # Arrange
     repo = UserRepository(session)
     user = User(
-            first_name="Test",
-            last_name="User",
-            phone="919-123-1234",
-            email="testuser@example.com",
+        first_name="Test",
+        last_name="User",
+        phone="919-123-1234",
+        email="testuser@example.com",
     )
     session.add(user)
     session.flush()
-    
+
     # Act
     user.first_name = "New"
     result = repo.update_user(user)
- 
+
     # Assert
     assert result.first_name == "New"
     persisted = repo.get_by_email("testuser@example.com")
     assert persisted is not None
     assert persisted.first_name == "New"
+
+
+@pytest.mark.integration
+def test_delete_user_removes_persisted_record(session: Session) -> None:
+    # Arrange
+    repo = UserRepository(session)
+    user = User(
+        first_name="Delete",
+        last_name="Me",
+        phone="919-777-7777",
+        email="deleteme@example.com",
+    )
+    session.add(user)
+    session.flush()
+
+    # Act
+    repo.delete(user)
+
+    # Assert
+    assert repo.get_by_id(user.id) is None

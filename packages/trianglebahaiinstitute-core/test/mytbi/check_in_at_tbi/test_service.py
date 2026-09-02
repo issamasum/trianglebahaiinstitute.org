@@ -269,7 +269,7 @@ def test_event_service_list_published_events_returns_published_and_active(
     events = [sample_published_event]
     mock_event_repo.lists_published_active_events.return_value = events
 
-    result = event_service.list_publisehd_events()
+    result = event_service.list_published_events()
 
     assert result == events
     assert len(result) == 1
@@ -282,7 +282,7 @@ def test_event_service_list_published_events_returns_empty_list(
     """Test listing published events when none exist."""
     mock_event_repo.lists_published_active_events.return_value = []
 
-    result = event_service.list_publisehd_events()
+    result = event_service.list_published_events()
 
     assert result == []
 
@@ -309,8 +309,37 @@ def test_event_service_get_event_raises_exception_when_not_found(
         event_service.get_event(999)
 
 
+def test_event_service_get_published_event_returns_existing_event(
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_published_event: Event,
+) -> None:
+    """Test retrieving a published and active event."""
+    mock_event_repo.get_by_id.return_value = sample_published_event
+
+    result = event_service.get_published_event(2)
+
+    assert result == sample_published_event
+    mock_event_repo.get_by_id.assert_called_once_with(2)
+
+
+def test_event_service_get_published_event_raises_when_event_not_visible(
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_unpublished_event: Event,
+) -> None:
+    """Test that unpublished events are hidden from visitor-facing access."""
+    mock_event_repo.get_by_id.return_value = sample_unpublished_event
+
+    with pytest.raises(EventNotFoundException, match="Event not found."):
+        event_service.get_published_event(3)
+
+
 def test_event_service_update_event_all_fields(
-    event_service: EventService, mock_event_repo: Mock, sample_user: User, sample_event: Event
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_user: User,
+    sample_event: Event,
 ) -> None:
     """Test updating all fields of an event."""
     mock_event_repo.get_by_id.return_value = sample_event
@@ -346,7 +375,10 @@ def test_event_service_update_event_all_fields(
 
 
 def test_event_service_update_event_single_field(
-    event_service: EventService, mock_event_repo: Mock, sample_user: User, sample_event: Event
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_user: User,
+    sample_event: Event,
 ) -> None:
     """Test updating a single field."""
     mock_event_repo.get_by_id.return_value = sample_event
@@ -370,7 +402,10 @@ def test_event_service_update_event_single_field(
 
 
 def test_event_service_update_event_no_fields_provided(
-    event_service: EventService, mock_event_repo: Mock, sample_user: User, sample_event: Event
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_user: User,
+    sample_event: Event,
 ) -> None:
     """Test updating an event with no field changes."""
     mock_event_repo.get_by_id.return_value = sample_event
@@ -393,7 +428,10 @@ def test_event_service_update_event_not_found(
 
 
 def test_event_service_cancel_event_sets_status_to_canceled(
-    event_service: EventService, mock_event_repo: Mock, sample_user: User, sample_event: Event
+    event_service: EventService,
+    mock_event_repo: Mock,
+    sample_user: User,
+    sample_event: Event,
 ) -> None:
     """Test canceling an existing event."""
     mock_event_repo.get_by_id.return_value = sample_event
@@ -442,7 +480,10 @@ def test_check_in_service_init_stores_repositories(
 
 
 def test_check_in_service_create_check_in_with_all_parameters_published_event(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_published_event: Event
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_published_event: Event,
 ) -> None:
     """Test creating a check-in with all parameters for a published event."""
     mock_event_repo.get_by_id.return_value = sample_published_event
@@ -478,7 +519,10 @@ def test_check_in_service_create_check_in_with_all_parameters_published_event(
 
 
 def test_check_in_service_create_check_in_minimal_parameters(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_published_event: Event
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_published_event: Event,
 ) -> None:
     """Test creating a check-in with minimal parameters."""
     mock_event_repo.get_by_id.return_value = sample_published_event
@@ -516,12 +560,14 @@ def test_check_in_service_create_check_in_event_not_found_published_required(
 
 
 def test_check_in_service_create_check_in_event_not_published(
-    check_in_service: CheckInService, mock_event_repo: Mock, sample_unpublished_event: Event
+    check_in_service: CheckInService,
+    mock_event_repo: Mock,
+    sample_unpublished_event: Event,
 ) -> None:
     """Test creating check-in when event is not published but required."""
     mock_event_repo.get_by_id.return_value = sample_unpublished_event
 
-    with pytest.raises(EventNotFoundException, match="Checkins are Closed."):
+    with pytest.raises(EventNotFoundException, match="Check-ins are Closed."):
         check_in_service.create_check_in(
             3,
             visitor_name="John",
@@ -530,12 +576,14 @@ def test_check_in_service_create_check_in_event_not_published(
 
 
 def test_check_in_service_create_check_in_event_not_active(
-    check_in_service: CheckInService, mock_event_repo: Mock, sample_canceled_event: Event
+    check_in_service: CheckInService,
+    mock_event_repo: Mock,
+    sample_canceled_event: Event,
 ) -> None:
     """Test creating check-in when event is not active but required."""
     mock_event_repo.get_by_id.return_value = sample_canceled_event
 
-    with pytest.raises(EventNotFoundException, match="Checkins are Closed."):
+    with pytest.raises(EventNotFoundException, match="Check-ins are Closed."):
         check_in_service.create_check_in(
             4,
             visitor_name="John",
@@ -544,7 +592,10 @@ def test_check_in_service_create_check_in_event_not_active(
 
 
 def test_check_in_service_create_check_in_coordinator_bypass_published_check(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_unpublished_event: Event
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_unpublished_event: Event,
 ) -> None:
     """Test that coordinators can check in to unpublished events."""
     mock_event_repo.get_by_id.return_value = sample_unpublished_event
@@ -565,7 +616,10 @@ def test_check_in_service_create_check_in_coordinator_bypass_published_check(
 
 
 def test_check_in_service_create_check_in_dietary_preferences_default_empty(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_published_event: Event
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_published_event: Event,
 ) -> None:
     """Test that dietary preferences default to empty list."""
     mock_event_repo.get_by_id.return_value = sample_published_event
@@ -656,8 +710,38 @@ def test_check_in_service_get_check_in_raises_exception_when_not_found(
         check_in_service.get_check_in(999)
 
 
+def test_check_in_service_get_check_in_for_event_returns_matching_check_in(
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    sample_check_in: CheckIn,
+) -> None:
+    """Test loading a check-in scoped to the expected event."""
+    mock_check_in_repo.get_by_id.return_value = sample_check_in
+    assert sample_check_in.event_id is not None
+
+    result = check_in_service.get_check_in_for_event(sample_check_in.event_id, 1)
+
+    assert result == sample_check_in
+
+
+def test_check_in_service_get_check_in_for_event_raises_on_event_mismatch(
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    sample_check_in: CheckIn,
+) -> None:
+    """Test event-scoped lookup rejects check-ins from another event."""
+    mock_check_in_repo.get_by_id.return_value = sample_check_in
+
+    with pytest.raises(CheckInNotFoundException, match="Check-in not found."):
+        check_in_service.get_check_in_for_event(999, 1)
+
+
 def test_check_in_service_list_check_ins_for_existing_event(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_event: Event, sample_check_in: CheckIn
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_event: Event,
+    sample_check_in: CheckIn,
 ) -> None:
     """Test listing check-ins for an existing event."""
     mock_event_repo.get_by_id.return_value = sample_event
@@ -672,7 +756,10 @@ def test_check_in_service_list_check_ins_for_existing_event(
 
 
 def test_check_in_service_list_check_ins_returns_empty_list(
-    check_in_service: CheckInService, mock_check_in_repo: Mock, mock_event_repo: Mock, sample_event: Event
+    check_in_service: CheckInService,
+    mock_check_in_repo: Mock,
+    mock_event_repo: Mock,
+    sample_event: Event,
 ) -> None:
     """Test listing check-ins when none exist for the event."""
     mock_event_repo.get_by_id.return_value = sample_event

@@ -11,7 +11,7 @@ from .config import Settings
 from .services.auth_service import AuthenticationException
 
 
-def verify_jwt(token: str, settings: Settings) -> int:
+def verify_jwt(token: str, settings: Settings) -> UUID:
     """Decodes a JWT and returns the user's ID.
 
     Args:

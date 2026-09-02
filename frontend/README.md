@@ -55,7 +55,6 @@ Routes are declared in `src/app/app.routes.ts`. The default (`/`) redirects to `
 - `AuthService` — client-side auth integration
 - `ThemeService` — light / dark / system theme toggle
 - `PageTitleService` — reactive toolbar title and browser tab title
-- `TollService` — tool API calls via generated client
 - `AuthTokenInterceptor` — attaches auth headers to `/api/*` requests
 
 ### Post-Save UX Pattern

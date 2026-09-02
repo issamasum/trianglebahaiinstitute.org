@@ -110,6 +110,7 @@ def test_event_repository_get_by_id_returns_event_when_found(
     repo = EventRepository(session)
 
     # Act
+    assert sample_event.id is not None
     result = repo.get_by_id(sample_event.id)
 
     # Assert
@@ -243,6 +244,7 @@ def test_event_repository_cancel_event_updates_status(
     # Assert
     assert result.status == EventStatus.CANCELED
     # Verify persistence
+    assert sample_event.id is not None
     persisted = repo.get_by_id(sample_event.id)
     assert persisted is not None
     assert persisted.status == EventStatus.CANCELED
@@ -262,6 +264,7 @@ def test_event_repository_update_modifies_event(
 
     # Assert
     assert result.event_name == "Updated Event Name"
+    assert sample_event.id is not None
     persisted = repo.get_by_id(sample_event.id)
     assert persisted is not None
     assert persisted.event_name == "Updated Event Name"
@@ -335,6 +338,7 @@ def test_check_in_repository_get_by_id_returns_check_in_when_found(
     session.flush()
 
     # Act
+    assert check_in.id is not None
     result = repo.get_by_id(check_in.id)
 
     # Assert
@@ -354,6 +358,7 @@ def test_check_in_repository_list_check_ins_by_event_returns_empty_when_no_check
     repo = CheckInRepository(session)
 
     # Act
+    assert sample_event.id is not None
     result = repo.list_check_ins_by_event(sample_event.id)
 
     # Assert
@@ -387,21 +392,16 @@ def test_check_in_repository_list_check_ins_by_event_returns_all_for_event(
     session.add(event2)
     session.flush()
 
-    check_in1 = CheckIn(
-        visitor_name="Visitor 1", meal=True, event_id=event1.id
-    )
-    check_in2 = CheckIn(
-        visitor_name="Visitor 2", meal=False, event_id=event1.id
-    )
-    check_in3 = CheckIn(
-        visitor_name="Visitor 3", meal=True, event_id=event2.id
-    )
+    check_in1 = CheckIn(visitor_name="Visitor 1", meal=True, event_id=event1.id)
+    check_in2 = CheckIn(visitor_name="Visitor 2", meal=False, event_id=event1.id)
+    check_in3 = CheckIn(visitor_name="Visitor 3", meal=True, event_id=event2.id)
     session.add(check_in1)
     session.add(check_in2)
     session.add(check_in3)
     session.flush()
 
     # Act
+    assert event1.id is not None
     result = repo.list_check_ins_by_event(event1.id)
 
     # Assert
@@ -429,15 +429,14 @@ def test_check_in_repository_list_check_ins_by_event_filters_correctly(
     session.add(event)
     session.flush()
 
-    check_in_for_event = CheckIn(
-        visitor_name="Event Visitor", event_id=event.id
-    )
+    check_in_for_event = CheckIn(visitor_name="Event Visitor", event_id=event.id)
     check_in_no_event = CheckIn(visitor_name="No Event Visitor", event_id=None)
     session.add(check_in_for_event)
     session.add(check_in_no_event)
     session.flush()
 
     # Act
+    assert event.id is not None
     result = repo.list_check_ins_by_event(event.id)
 
     # Assert
@@ -472,6 +471,7 @@ def test_check_in_repository_update_modifies_check_in(
     assert result.visitor_name == "Updated Name"
     assert result.age == 25
     assert result.meal is True
+    assert check_in.id is not None
     persisted = repo.get_by_id(check_in.id)
     assert persisted is not None
     assert persisted.visitor_name == "Updated Name"

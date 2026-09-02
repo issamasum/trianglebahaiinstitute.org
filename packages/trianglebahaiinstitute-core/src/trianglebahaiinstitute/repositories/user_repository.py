@@ -3,6 +3,7 @@
 
 """Persistence helper for user records."""
 
+from uuid import UUID
 
 from pydantic import EmailStr
 from sqlmodel import select
@@ -11,7 +12,7 @@ from ..tables.user import User
 from .base_repository import BaseRepository
 
 
-class UserRepository(BaseRepository[User, int]):
+class UserRepository(BaseRepository[User, UUID]):
     """Provides user lookup and persistence operations."""
 
     @property
@@ -19,10 +20,9 @@ class UserRepository(BaseRepository[User, int]):
         """Returns the SQLModel class managed by this repository."""
         return User
 
-        
     def list_all(self) -> list[User]:
         """Returns all registerred users.
-        
+
         Returns:
             A list of all user records.
         """
@@ -33,7 +33,7 @@ class UserRepository(BaseRepository[User, int]):
 
         Args:
             new_user: User instance to add
-        
+
         Returns:
             The persisted user with refreshed database state.
         """
@@ -41,17 +41,16 @@ class UserRepository(BaseRepository[User, int]):
 
     def update_user(self, user: User) -> User:
         """Persist changes to an existing user and refreshes database state.
-        
+
         Args:
             user: User instance with updated fields.
-        
+
         Returns:
             The updated user with refreshed database state.
         """
         return self.update(user)
 
-    
     def get_by_email(self, email: EmailStr) -> User | None:
         """Looks up a user by their email"""
-        
+
         return self._session.exec(select(User).where(User.email == email)).first()

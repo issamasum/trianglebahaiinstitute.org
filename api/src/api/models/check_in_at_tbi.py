@@ -8,7 +8,11 @@ from typing import Optional
 import uuid
 
 
-from trianglebahaiinstitute.mytbi.checkin_at_tbi.tables import EventStatus, EventCreationType, DietaryPreference
+from trianglebahaiinstitute.mytbi.checkin_at_tbi.tables import (
+    EventStatus,
+    EventCreationType,
+    DietaryPreference,
+)
 
 from pydantic import BaseModel
 
@@ -45,7 +49,7 @@ class EventResponse(BaseModel):
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
     status: EventStatus
-    publish: bool 
+    publish: bool
     creation_type: EventCreationType
     external_calender_id: Optional[str] = None
     created_by: uuid.UUID
@@ -86,6 +90,8 @@ class UpdateCheckInRequest(BaseModel):
 
 class CheckInResponse(BaseModel):
     """Payload for checking in at the TBI."""
+
+    model_config = {"from_attributes": True}
 
     id: int
     visitor_name: str

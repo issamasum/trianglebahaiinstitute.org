@@ -3,7 +3,6 @@
 
 """Check-in at TBI models, tables, and serivce."""
 
-
 from .tables import (
     CheckIn,
     Event,
@@ -13,4 +12,3 @@ __all__ = [
     "Event",
     "CheckIn",
 ]
-

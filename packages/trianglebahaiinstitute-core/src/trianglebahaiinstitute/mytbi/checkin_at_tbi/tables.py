@@ -20,7 +20,7 @@ class EventStatus(str, enum.Enum):
 
 
 class EventCreationType(str, enum.Enum):
-    """ Defines how an event was created."""
+    """Defines how an event was created."""
 
     MANUAL = "manual"
     SYNCED = "synced"
@@ -42,60 +42,51 @@ class DietaryPreference(str, enum.Enum):
 class Event(SQLModel, table=True):
     """Represents an event being held at the triangle Baha'i Institute."""
 
-    id: int = Field(
-        sa_column=Column(Integer, primary_key=True, autoincrement=True)
+    id: int | None = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True),
     )
-    event_name: str = Field(
-        nullable=False
-    )
-    start_date: datetime = Field(
+    event_name: str = Field(nullable=False)
+    start_date: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             nullable=True,
         ),
-        default=None
+        default=None,
     )
-    end_date: datetime = Field(
+    end_date: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             nullable=True,
         ),
-        default=None
+        default=None,
     )
     status: EventStatus = Field(
         sa_column=Column(
-            Enum(
-                EventStatus,
-                values_callable=lambda e: [m.value for m in e]),
-                nullable=False,
-            ),
-            default=EventStatus.ACTIVE.value
-       
+            Enum(EventStatus, values_callable=lambda e: [m.value for m in e]),
+            nullable=False,
+        ),
+        default=EventStatus.ACTIVE.value,
     )
-    publish: bool = Field(
-        default=True
-    )
-    creation_type: EventCreationType =  Field(
+    publish: bool = Field(default=True)
+    creation_type: EventCreationType = Field(
         sa_column=Column(
-            Enum(
-             EventCreationType,
-                values_callable=lambda e: [m.value for m in e]),
-                nullable=False,
-            ),
-            default=EventCreationType.MANUAL.value
+            Enum(EventCreationType, values_callable=lambda e: [m.value for m in e]),
+            nullable=False,
+        ),
+        default=EventCreationType.MANUAL.value,
     )
-    external_calender_id: str = Field(
+    external_calender_id: str | None = Field(
         sa_column=Column(String, nullable=True),
         default=None,
-    
     )
     created_by: uuid.UUID = Field(
         sa_column=Column(Uuid, ForeignKey("user.id"), nullable=False)
     )
     updated_by: uuid.UUID = Field(
-            sa_column=Column(Uuid, ForeignKey("user.id"), nullable=False)
-        )
-    created_at: datetime = Field(
+        sa_column=Column(Uuid, ForeignKey("user.id"), nullable=False)
+    )
+    created_at: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             server_default=func.now(),
@@ -103,7 +94,7 @@ class Event(SQLModel, table=True):
         ),
         default=None,
     )
-    updated_at: datetime = Field(
+    updated_at: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             server_default=func.now(),
@@ -117,35 +108,31 @@ class Event(SQLModel, table=True):
 class CheckIn(SQLModel, table=True):
     """Represents a checked in visitor at the Triangle Baha'i Institute."""
 
-    id: int = Field(
-            sa_column=Column(Integer, primary_key=True, autoincrement=True)
-        )
-    visitor_name: str = Field(
-            nullable=False
+    id: int | None = Field(
+        default=None,
+        sa_column=Column(Integer, primary_key=True, autoincrement=True),
     )
-    age: int | None = Field(nullable=True)
+    visitor_name: str = Field(nullable=False)
+    age: int | None = Field(default=None, nullable=True)
     meal: bool = Field(default=False)
     dietary_preferences: list[DietaryPreference] = Field(
         sa_column=Column(
             ARRAY(
                 Enum(DietaryPreference, values_callable=lambda e: [m.value for m in e])
-                ), 
-                nullable=True),
+            ),
+            nullable=True,
+        ),
         default_factory=list,
     )
-    allergies: str | None = Field(nullable=True)
-    purpose: str | None = Field(nullable=True)
+    allergies: str | None = Field(default=None, nullable=True)
+    purpose: str | None = Field(default=None, nullable=True)
     event_id: int | None = Field(
-        sa_column=Column(
-            Integer, ForeignKey("event.id"), nullable=True
-            )
+        default=None, sa_column=Column(Integer, ForeignKey("event.id"), nullable=True)
     )
     user_id: uuid.UUID | None = Field(
-            sa_column=Column(
-                Uuid, ForeignKey("user.id"), nullable=True
-                )
-        )
-    checked_in_at: datetime = Field(
+        default=None, sa_column=Column(Uuid, ForeignKey("user.id"), nullable=True)
+    )
+    checked_in_at: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             server_default=func.now(),
@@ -153,4 +140,3 @@ class CheckIn(SQLModel, table=True):
         ),
         default=None,
     )
-   
