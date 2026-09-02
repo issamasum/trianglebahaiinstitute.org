@@ -111,7 +111,9 @@ def test_get_settings_returns_cached_settings_instance() -> None:
     assert first_settings is second_settings
 
 
-def test_find_env_file_returns_nearest_parent_env_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_find_env_file_returns_nearest_parent_env_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Arrange
     repo_dir = tmp_path / "repo"
     nested_dir = repo_dir / "packages" / "trianglebahaiinstitute-core"
@@ -127,7 +129,9 @@ def test_find_env_file_returns_nearest_parent_env_file(tmp_path: Path, monkeypat
     assert discovered_env_file == env_file
 
 
-def test_settings_load_from_nearest_parent_env_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_settings_load_from_nearest_parent_env_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Arrange
     repo_dir = tmp_path / "repo"
     nested_dir = repo_dir / "packages" / "trianglebahaiinstitute-core"
@@ -144,7 +148,9 @@ def test_settings_load_from_nearest_parent_env_file(tmp_path: Path, monkeypatch:
     assert settings.log_level == "DEBUG"
 
 
-def test_settings_require_env_file_in_development(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_settings_require_env_file_in_development(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Arrange
     working_dir = tmp_path / "repo" / "packages" / "trianglebahaiinstitute-core"
     working_dir.mkdir(parents=True)
@@ -156,7 +162,9 @@ def test_settings_require_env_file_in_development(tmp_path: Path, monkeypatch: p
         Settings()
 
 
-def test_settings_allow_missing_env_file_outside_development(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_settings_allow_missing_env_file_outside_development(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     # Arrange
     working_dir = tmp_path / "repo" / "packages" / "trianglebahaiinstitute-core"
     working_dir.mkdir(parents=True)
@@ -167,4 +175,3 @@ def test_settings_allow_missing_env_file_outside_development(tmp_path: Path, mon
 
     # Assert
     assert settings.environment == "test"
-

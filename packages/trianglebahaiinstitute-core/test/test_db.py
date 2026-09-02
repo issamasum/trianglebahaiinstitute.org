@@ -20,7 +20,9 @@ def test_get_engine_builds_engine_from_settings() -> None:
     # Act
     with (
         patch("trianglebahaiinstitute.db.get_settings", return_value=expected_settings),
-        patch("trianglebahaiinstitute.db.create_engine", return_value="engine") as create_engine_mock,
+        patch(
+            "trianglebahaiinstitute.db.create_engine", return_value="engine"
+        ) as create_engine_mock,
     ):
         db.get_engine.cache_clear()
         engine = db.get_engine()
@@ -44,7 +46,9 @@ def test_get_engine_returns_cached_engine() -> None:
     # Act
     with (
         patch("trianglebahaiinstitute.db.get_settings", return_value=expected_settings),
-        patch("trianglebahaiinstitute.db.create_engine", return_value="engine") as create_engine_mock,
+        patch(
+            "trianglebahaiinstitute.db.create_engine", return_value="engine"
+        ) as create_engine_mock,
     ):
         db.get_engine.cache_clear()
         first_engine = db.get_engine()
@@ -65,9 +69,13 @@ def test_create_db_and_tables_uses_cached_engine() -> None:
 
     # Act
     with (
-        patch("trianglebahaiinstitute.db.load_table_metadata") as load_table_metadata_mock,
+        patch(
+            "trianglebahaiinstitute.db.load_table_metadata"
+        ) as load_table_metadata_mock,
         patch("trianglebahaiinstitute.db.get_engine", return_value=expected_engine),
-        patch("trianglebahaiinstitute.db.SQLModel.metadata.create_all") as create_all_mock,
+        patch(
+            "trianglebahaiinstitute.db.SQLModel.metadata.create_all"
+        ) as create_all_mock,
     ):
         db.create_db_and_tables()
 
@@ -82,16 +90,19 @@ def test_load_table_metadata_imports_tables_package() -> None:
         db.load_table_metadata()
 
     # Assert
-    assert import_module_mock.call_count == 4
+    assert import_module_mock.call_count == 2
     import_module_mock.assert_any_call("trianglebahaiinstitute.tables")
-    import_module_mock.assert_any_call("trianglebahaiinstitute.tools.jokes.tables")
-    import_module_mock.assert_any_call("trianglebahaiinstitute.activities.iyow.tables")
+    import_module_mock.assert_any_call(
+        "trianglebahaiinstitute.mytbi.checkin_at_tbi.tables"
+    )
 
 
 def test_reset_db_and_tables_resets_postgresql_database_and_recreates_tables() -> None:
     # Arrange
     expected_settings = SimpleNamespace(
-        effective_database_url=("postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute")
+        effective_database_url=(
+            "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute"
+        )
     )
     engine = MagicMock()
 
@@ -99,8 +110,12 @@ def test_reset_db_and_tables_resets_postgresql_database_and_recreates_tables() -
     with (
         patch("trianglebahaiinstitute.db.get_settings", return_value=expected_settings),
         patch("trianglebahaiinstitute.db.get_engine", return_value=engine),
-        patch("trianglebahaiinstitute.db._reset_postgresql_database") as reset_postgres_mock,
-        patch("trianglebahaiinstitute.db.create_db_and_tables") as create_db_and_tables_mock,
+        patch(
+            "trianglebahaiinstitute.db._reset_postgresql_database"
+        ) as reset_postgres_mock,
+        patch(
+            "trianglebahaiinstitute.db.create_db_and_tables"
+        ) as create_db_and_tables_mock,
     ):
         db.reset_db_and_tables()
 
@@ -112,7 +127,9 @@ def test_reset_db_and_tables_resets_postgresql_database_and_recreates_tables() -
 
 def test_reset_db_and_tables_raises_for_unsupported_driver() -> None:
     # Arrange
-    expected_settings = SimpleNamespace(effective_database_url="mysql://user:pass@localhost:3306/trianglebahaiinstitute")
+    expected_settings = SimpleNamespace(
+        effective_database_url="mysql://user:pass@localhost:3306/trianglebahaiinstitute"
+    )
 
     # Act / Assert
     with (
@@ -129,13 +146,17 @@ def test_reset_db_and_tables_raises_for_unsupported_driver() -> None:
 
 def test_reset_postgresql_database_recreates_database() -> None:
     # Arrange
-    database_url = db.make_url("postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute")
+    database_url = db.make_url(
+        "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute"
+    )
     admin_engine = MagicMock()
     connection = MagicMock()
     admin_engine.connect.return_value.__enter__.return_value = connection
 
     # Act
-    with patch("trianglebahaiinstitute.db.create_engine", return_value=admin_engine) as create_engine_mock:
+    with patch(
+        "trianglebahaiinstitute.db.create_engine", return_value=admin_engine
+    ) as create_engine_mock:
         db._reset_postgresql_database(database_url)
 
     # Assert
@@ -178,7 +199,9 @@ def test_get_session_yields_session_from_engine() -> None:
     # Act
     with (
         patch("trianglebahaiinstitute.db.get_engine", return_value=expected_engine),
-        patch("trianglebahaiinstitute.db.Session", return_value=mock_session) as session_mock,
+        patch(
+            "trianglebahaiinstitute.db.Session", return_value=mock_session
+        ) as session_mock,
     ):
         gen = db.get_session()
         yielded = next(gen)

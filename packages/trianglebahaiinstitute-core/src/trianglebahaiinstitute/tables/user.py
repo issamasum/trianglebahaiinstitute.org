@@ -21,45 +21,30 @@ class User(SQLModel, table=True):
     """Represents an authenticated user using featured requiring authentication."""
 
     id: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
-        sa_column=Column(Uuid, primary_key=True)
+        default_factory=uuid.uuid4, sa_column=Column(Uuid, primary_key=True)
     )
-    first_name: str = Field(
-        nullable=False
-    )
-    last_name: str = Field(
-        nullable=False
-    )
-    phone: str = Field(
-        nullable=True
-    )
-    email: str = Field(
-        nullable=False, unique=True
-    )
-    password_hash: str = Field(
-       nullable=True 
-    )
+    first_name: str = Field(nullable=False)
+    last_name: str = Field(nullable=False)
+    phone: str | None = Field(default=None, nullable=True)
+    email: str = Field(nullable=False, unique=True)
+    password_hash: str | None = Field(default=None, nullable=True)
     role: UserRole = Field(
+        default=None,
         sa_column=Column(
-            Enum(
-                UserRole,
-                values_callable=lambda e: [m.value for m in e]),
-                nullable=True,
-            )
+            Enum(UserRole, values_callable=lambda e: [m.value for m in e]),
+            nullable=True,
+        ),
     )
-    is_active: bool = Field(
-        default=True,
-        nullable=False
-    )
-    created_at: datetime = Field(
+    is_active: bool = Field(default=True, nullable=False)
+    created_at: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             server_default=func.now(),
             nullable=False,
         ),
-        default=None
+        default=None,
     )
-    last_logged_at: datetime = Field(
+    last_logged_at: datetime | None = Field(
         sa_column=Column(
             DateTime(timezone=True),
             nullable=True,

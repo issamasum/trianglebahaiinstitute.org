@@ -17,7 +17,6 @@ from .check_in_at_tbi import (
     CreateCheckInRequest,
     UpdateCheckInRequest,
     CreateGeneralCheckInRequest,
-    
 )
 
 __all__ = [

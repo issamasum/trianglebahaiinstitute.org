@@ -40,8 +40,7 @@ def create_db_and_tables() -> None:
 def load_table_metadata() -> None:
     """Imports SQLModel table modules so their metadata is registered."""
     import_module("trianglebahaiinstitute.tables")
-    import_module("trianglebahaiinstitute.mytbi.chekin_at_tbi.tables")
-   
+    import_module("trianglebahaiinstitute.mytbi.checkin_at_tbi.tables")
 
 
 def reset_db_and_tables() -> None:
@@ -62,7 +61,9 @@ def reset_db_and_tables() -> None:
         engine.dispose()
         _reset_postgresql_database(database_url)
     else:
-        raise ValueError(f"Unsupported database driver for reset: {database_url.drivername}")
+        raise ValueError(
+            f"Unsupported database driver for reset: {database_url.drivername}"
+        )
 
     get_engine.cache_clear()
     create_db_and_tables()

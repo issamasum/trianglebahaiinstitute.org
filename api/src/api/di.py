@@ -16,6 +16,14 @@ from trianglebahaiinstitute.services.auth_service import (
     AuthenticationException,
     AuthService,
 )
+from trianglebahaiinstitute.mytbi.checkin_at_tbi.repository import (
+    EventRepository,
+    CheckInRepository,
+)
+from trianglebahaiinstitute.mytbi.checkin_at_tbi.service import (
+    EventService,
+    CheckInService,
+)
 from trianglebahaiinstitute.tables.user import User, UserRole
 from sqlmodel import Session
 
@@ -26,23 +34,39 @@ __all__ = [
     "UserRepositoryDI",
     "AuthenticatedUserDI",
     "CoordinatorUserDI",
-
+    "EventRepositoryDI",
+    "CheckInRepositoryDI",
+    "EventServiceDI",
+    "CheckInServiceDI",
+    "auth_service_factory",
+    "settings_factory",
+    "user_repository_factory",
+    "get_authenticated_user",
+    "require_coordinator",
+    "event_repository_factory",
+    "check_in_repository_factory",
+    "event_service_factory",
+    "check_in_service_factory",
 ]
 
-def auth_serivce_factory(settings: SettingsDI, user_repository: UserRepositoryDI) -> AuthService:
+
+def auth_service_factory(
+    settings: SettingsDI, user_repository: UserRepositoryDI
+) -> AuthService:
     """Creates the authentication service for the current request.
 
     Args:
         settings: Appication settings.
         user_repository: Repository used to load and persist users.
-    
+
     Returns:
         A configured authenticated service.
     """
 
     return AuthService(settings, user_repository)
 
-AuthServiceDI: TypeAlias = Annotated[AuthService, Depends(auth_serivce_factory)]
+
+AuthServiceDI: TypeAlias = Annotated[AuthService, Depends(auth_service_factory)]
 
 
 SessionDI: TypeAlias = Annotated[Session, Depends(get_session)]
@@ -61,11 +85,14 @@ def user_repository_factory(session: SessionDI) -> UserRepository:
     return UserRepository(session)
 
 
-UserRepositoryDI: TypeAlias = Annotated[UserRepository, Depends(user_repository_factory)]
+UserRepositoryDI: TypeAlias = Annotated[
+    UserRepository, Depends(user_repository_factory)
+]
+
 
 def get_authenticated_user(
-        auth_svc: AuthServiceDI,
-        credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())]
+    auth_svc: AuthServiceDI,
+    credentials: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())],
 ) -> User:
     """Authenticates the current request from a bearer token.
 
@@ -81,6 +108,7 @@ def get_authenticated_user(
     if subject is None:
         raise HTTPException(status_code=401, detail="User not found.")
     return subject
+
 
 AuthenticatedUserDI: TypeAlias = Annotated[User, Depends(get_authenticated_user)]
 
@@ -103,3 +131,43 @@ def require_coordinator(user: AuthenticatedUserDI) -> User:
 
 
 CoordinatorUserDI: TypeAlias = Annotated[User, Depends(require_coordinator)]
+
+
+def event_repository_factory(session: SessionDI) -> EventRepository:
+    """Constructs an event repository bound to the current request session."""
+    return EventRepository(session)
+
+
+EventRepositoryDI: TypeAlias = Annotated[
+    EventRepository, Depends(event_repository_factory)
+]
+
+
+def check_in_repository_factory(session: SessionDI) -> CheckInRepository:
+    """Constructs a check-in repository bound to the current request session."""
+    return CheckInRepository(session)
+
+
+CheckInRepositoryDI: TypeAlias = Annotated[
+    CheckInRepository, Depends(check_in_repository_factory)
+]
+
+
+def event_service_factory(event_repo: EventRepositoryDI) -> EventService:
+    """Creates the event service for the current request."""
+    return EventService(event_repo)
+
+
+EventServiceDI: TypeAlias = Annotated[EventService, Depends(event_service_factory)]
+
+
+def check_in_service_factory(
+    check_in_repo: CheckInRepositoryDI, event_repo: EventRepositoryDI
+) -> CheckInService:
+    """Creates the check-in service for the current request."""
+    return CheckInService(check_in_repo, event_repo)
+
+
+CheckInServiceDI: TypeAlias = Annotated[
+    CheckInService, Depends(check_in_service_factory)
+]

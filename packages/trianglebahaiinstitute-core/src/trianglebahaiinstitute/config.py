@@ -50,7 +50,6 @@ class Settings(BaseSettings):
     database_url: str | None = None
     db_echo: bool = True
 
-
     # App / API
     api_host: str = "0.0.0.0"
     api_port: int = 8000
@@ -80,7 +79,9 @@ class Settings(BaseSettings):
         In development mode, a missing `.env` is treated as a setup error.
         In test and production, environment variables alone are allowed.
         """
-        environment = str(values.get("environment") or os.environ.get("ENVIRONMENT") or "development").lower()
+        environment = str(
+            values.get("environment") or os.environ.get("ENVIRONMENT") or "development"
+        ).lower()
         env_file = find_env_file()
 
         if env_file is None and environment == "development":
@@ -102,7 +103,6 @@ class Settings(BaseSettings):
             return "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute_test"
 
         return "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute"
-
 
     @computed_field
     @property

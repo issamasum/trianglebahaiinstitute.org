@@ -1,4 +1,4 @@
-#Copyright (c) 2026 Kris Jordan
+# Copyright (c) 2026 Kris Jordan
 #  Copyright (c) 2026 Issa Masumbuko
 # SPDX-License-Identifier: MIT
 
@@ -12,7 +12,9 @@ from sqlmodel import Session, SQLModel, create_engine
 
 from trianglebahaiinstitute.config import get_settings
 
-DEFAULT_TEST_DB_URL = "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute_test"
+DEFAULT_TEST_DB_URL = (
+    "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute_test"
+)
 TEST_DB_URL = os.environ.get("TEST_DATABASE_URL", DEFAULT_TEST_DB_URL)
 
 
