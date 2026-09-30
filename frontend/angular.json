@@ -1,0 +1,113 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "pnpm",
+    "analytics": false
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "trianglebahaiinstitute": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": ["src/styles/styles.scss", "src/styles/tailwind.css"],
+            "server": "src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": []
+            },
+            "ssr": {
+              "entry": "src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                 "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts" 
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json",
+            "allowedHosts": true
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "trianglebahaiinstitute:build:production"
+            },
+            "development": {
+              "buildTarget": "trianglebahaiinstitute:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "tsconfig.spec.json",
+            "runnerConfig": "vitest.config,ts"
+          },
+          "configurations": {
+            "ci": {
+              "coverage": true,
+              "coverageExclude": [
+                "src/main.ts",
+                "src/app/app.component.ts",
+                "src/app/theme.service.ts",
+                "src/app/api/generated/**",
+                "src/environments/environment.ts",
+                "src/app/landing/landing.component.html"
+              ],
+              "coverageThresholds": {
+                "statements": 100,
+                "branches": 100,
+                "functions": 100,
+                "lines": 100
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

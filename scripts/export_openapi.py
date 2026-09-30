@@ -3,7 +3,7 @@
 
 """Export the OpenAPI specification to frontend/openapi.json.
 
-Usage::
+Usage:
 
     uv run python scripts/export_openapi.py
 

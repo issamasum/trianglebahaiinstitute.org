@@ -46,7 +46,7 @@ The `Layout` component in `src/app/layout/` provides a responsive shell:
 
 ### Routes
 
-Routes are declared in `src/app/app.routes.ts`. The default (`/`) redirects to `/courses`. Authenticated routes sit inside the `Layout` shell:
+Routes are declared in `src/app/app.routes.ts`. The default (`/`) redirects to `/homes`. Authenticated routes sit inside the `Layout` shell:
 
 
 

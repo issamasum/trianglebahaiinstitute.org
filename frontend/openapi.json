@@ -1,0 +1,1778 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "trianglebahaiinstitute",
+    "description": "HTTP for TriangleBahaiInstitute.org, including operational endpoins, authentication flows, and feature management.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Operations"
+        ],
+        "summary": "Get service health",
+        "description": "Returns the current service health payload.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Current health details for the API service.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/general/check-ins": {
+      "post": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Record a general check-in on behalf of a visitor.",
+        "description": "Coordinator manually records a check-in with no scheduled event.\n\nArgs:\n    body: The visitor's name and reason for visiting.\n    check_in_svc: Service used to record the check-in.\n\nReturns:\n    The newly created check-in.",
+        "operationId": "admin_create_general_check_in",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGeneralCheckInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created check-in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/events": {
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Gets all events",
+        "description": "Get all events.\n\nArgs:\n    subject: The coordinator requesting the list.\n    event_svc: Service used to load events.\n\nReturns:\n    A list of all events.",
+        "operationId": "admin_list_events",
+        "responses": {
+          "200": {
+            "description": "A list of all events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EventResponse"
+                  },
+                  "type": "array",
+                  "title": "Response Admin List Events"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Create an event",
+        "description": "Creates a new event.\nArgs:\n    subject: The coordinator creating the event.\n    body: The event's details.\n    event_svc: Service used to create the event.\n\nReturns:\n    The newly created event.",
+        "operationId": "admin_create_event",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEventRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/check-in/events/analysis": {
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Analyze all events",
+        "description": "Analyze all events.\"\n\nArgs:\n    TBD\n\nReturns:\n    TBD",
+        "operationId": "admin_analyze_all_events",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "Not authonticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/events/{event_id}/analysis": {
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Analyze an event",
+        "description": "Analyze a single event.\"\n\nArgs:\n    TBD\n\nReturns:\n    TBD",
+        "operationId": "admin_analyze_event",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "Not authonticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/events/{event_id}": {
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Gets an event",
+        "description": "Get a single event's details.\n\nArgs:\n    event_id: The event being requested.\n    event_svc: Serivce used to load the event.\n\nReturns:\n    A list of all events.",
+        "operationId": "admin_get_event",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Details of the event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Update an event",
+        "description": "Update an existing event.\n\nArgs:\n    subject: The coordinator making the change.\n    event_id: The event to update.\n    body: The fields to update; fields left unset are untouched.\n    event_svc: Service used to persist the change.\n\nReturns:\n    The updated event.",
+        "operationId": "admin_update_event",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEventRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The updated event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Soft delete an event",
+        "description": "Soft delete an event. Sets status to \"canceled\"\n\nArgs:\n    subject: the coordinator canceling the event.\n    event_id: the event being cancelled.\n    event_svc: Service to persist the change.\n\nReturns:\n    None.",
+        "operationId": "admin_admin_delete_event",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/events/{event_id}/check-ins": {
+      "post": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Add or check in a visitor to an existing event.",
+        "description": "Adds a new check-in to an existing event.\n\nArgs:\n     event_id: The event being checked into.\n     body: The visitor's check-in details.\n     check_in_svc: Service used to record the check-in.\n\n Returns:\n     The newly added check-in.",
+        "operationId": "admin_create_check_in",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly added check-in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authonticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Lists check-ins for an existing event.",
+        "description": "Gets a list of all checked in visitors for an event.\n\nArgs:\n    event_id: The event the check-ins are registered for.\n    check_in_svc: Service used to load check-ins.\n\nReturns:\n    The list of checked in visitors.",
+        "operationId": "admin_list_check_ins",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of checked in visitors of an event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CheckInResponse"
+                  },
+                  "title": "Response Admin List Check Ins"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/check-in/events/{event_id}/check-ins/{check_in_id}": {
+      "get": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Get particular checked in visitor.",
+        "description": "Gets a single check-in's details.\n\nArgs:\n     event_id: The event the check-in belongs to.\n     check_in_id: The check-in being requested.\n     check_in_svc: Service used to load the check-in.\n\n Returns:\n     The check-in's details.",
+        "operationId": "admin_get_check_in",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          },
+          {
+            "name": "check_in_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Check In Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A check-in's details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Check-in not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Updates a check-in.",
+        "description": "Updates a chek-in.\n\nArgs:\n     event_id: The event the check-in belong to.\n     check_in_id: The check-in to update.\n     body: The fields to update.\n     check_in_svc: Service used to persist the change.\n\n Returns:\n     The updated check-in.",
+        "operationId": "admin_update_check_in",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          },
+          {
+            "name": "check_in_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Check In Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCheckInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The updated check-in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authonticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Check-in not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin Tools"
+        ],
+        "summary": "Hard deletes a check-in.",
+        "description": "Hard deletion of a check-in.\n\nArgs:\n    event_id: The event the check-in should belong to.\n    check_in_id: The check-in to delete.\n    check_in_svc: Service used to persist the deletion.\n\nReturns:\n    None.",
+        "operationId": "admin_delete_check_in",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          },
+          {
+            "name": "check_in_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Check In Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "description": "Not authonticated."
+          },
+          "403": {
+            "description": "Insufficient permissions."
+          },
+          "404": {
+            "description": "Check-in not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/check-in/events": {
+      "get": {
+        "tags": [
+          "Check In"
+        ],
+        "summary": "Lists publisehed and active events.",
+        "description": "Lists published and active events for visitors to see.\n\nArgs:\n    event_svc: Service used to load events.\n\nReturns:\n    A list of published and active events.",
+        "operationId": "list_events",
+        "responses": {
+          "200": {
+            "description": "The list of published and active events.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/EventResponse"
+                  },
+                  "type": "array",
+                  "title": "Response List Events"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/check-in/events/{event_id}": {
+      "get": {
+        "tags": [
+          "Check In"
+        ],
+        "summary": "Get a published event's details.",
+        "description": "Gets a single published event's details for the check-in form header.\n\nDoes not return participant/check-in data.\n\nArgs:\n    event_id: The event being requested.\n    event_svc: Service used to load the event.\n\nReturns:\n    The event's name and dates.",
+        "operationId": "get_event",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event's name and dates.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/check-in/events/{event_id}/check-ins": {
+      "post": {
+        "tags": [
+          "Check In"
+        ],
+        "summary": "Record a visitor's check-in to an existing event.",
+        "description": "Check-in for an event.\n\n Args:\n    event_id: The event being checked into.\n    body: The visitor's check-in details.\n    check_in_svc: Service used to record the check-in.\n\nReturns:\n    The newly created check-in.",
+        "operationId": "create_check_in",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCheckInRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created check-in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/check-in/general/check-ins": {
+      "post": {
+        "tags": [
+          "Check In"
+        ],
+        "summary": "Record a general check-in.",
+        "description": "Records a check-in with no scheduled event.\n\nArgs:\n    body: The visitor's name and reason for visiting.\n    check_in_svc: Service used to record the check-in.\n\nReturns:\n    The newly created check-in.",
+        "operationId": "create_general_check_in",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGeneralCheckInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The newly created check-in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mytbi/auth/signup": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Starts sign up process",
+        "description": "Registers a new user and returns an access token.\n\nArgs:\n    payload: The new user's registration details.\n    auth_svc: Service used to coordinate authentication.\n\nReturns:\n    An access token for the newly created user.\n\nRaises:\n    HTTPException: If the email is already registered, or\n    if the password does not meet strength requirements.",
+        "operationId": "user_signup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mytbi/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "User Login Authentication",
+        "description": "Authenticates a user and returns an access token.\n\nArgs:\n    payload: The user's login credentials.\n    auth_svc: Service used to coordinate authentication.\n\nReturns:\n    An access token for the authenticated user.\n\nRaises:\n    HTTPException: If the email or password is incorrect.",
+        "operationId": "user_login_authentication",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/mytbi/me": {
+      "get": {
+        "tags": [
+          "Authenticated User"
+        ],
+        "summary": "Get the authenticated user profile",
+        "description": "Returns the authenticated user's profile.\n\nArgs:\n    subject: Authenticated subject resolved from the bearer token.\n\nReturns:\n    A UserProfile for the API.",
+        "operationId": "get_current_subject_profile",
+        "responses": {
+          "200": {
+            "description": "Profile details for the authenticated user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer token is missing, invalid, or expired."
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Authenticated User"
+        ],
+        "summary": "Update the authenticated user's profile",
+        "description": "Updates whichever fields are provided on the authenticated user's profile.\n\nFields omitted from the request body are left unchanged.\n\nArgs:\n    subject: TAuthenticated subject resolved from the bearer token.\n    body: Profile update payload.\n    user_repo: Repository used to persist the change.\n\nReturns:\n    The updated user profile.\n\nRaises:\n    HTTPException: If the requested email is already taken by another user.",
+        "operationId": "update_current_subject_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The updated profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Bearer token is missing, invalid, or expired."
+          },
+          "409": {
+            "description": "The requested email is already in use."
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CheckInResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "visitor_name": {
+            "type": "string",
+            "title": "Visitor Name"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "meal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meal"
+          },
+          "dietary_preferences": {
+            "items": {
+              "$ref": "#/components/schemas/DietaryPreference"
+            },
+            "type": "array",
+            "title": "Dietary Preferences",
+            "default": []
+          },
+          "allergies": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allergies"
+          },
+          "event_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Id"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          },
+          "purpose": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Purpose"
+          },
+          "checked_in_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Checked In At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "visitor_name",
+          "checked_in_at"
+        ],
+        "title": "CheckInResponse",
+        "description": "Payload for checking in at the TBI."
+      },
+      "CreateCheckInRequest": {
+        "properties": {
+          "visitor_name": {
+            "type": "string",
+            "title": "Visitor Name"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "meal": {
+            "type": "boolean",
+            "title": "Meal",
+            "default": false
+          },
+          "dietary_preferences": {
+            "items": {
+              "$ref": "#/components/schemas/DietaryPreference"
+            },
+            "type": "array",
+            "title": "Dietary Preferences",
+            "default": []
+          },
+          "allergies": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allergies"
+          }
+        },
+        "type": "object",
+        "required": [
+          "visitor_name"
+        ],
+        "title": "CreateCheckInRequest",
+        "description": "Payload for checking in at the TBI."
+      },
+      "CreateEventRequest": {
+        "properties": {
+          "event_name": {
+            "type": "string",
+            "title": "Event Name"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "publish": {
+            "type": "boolean",
+            "title": "Publish",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "event_name"
+        ],
+        "title": "CreateEventRequest",
+        "description": "Payload for updating an event."
+      },
+      "CreateGeneralCheckInRequest": {
+        "properties": {
+          "visitor_name": {
+            "type": "string",
+            "title": "Visitor Name"
+          },
+          "purpose": {
+            "type": "string",
+            "title": "Purpose"
+          }
+        },
+        "type": "object",
+        "required": [
+          "visitor_name",
+          "purpose"
+        ],
+        "title": "CreateGeneralCheckInRequest",
+        "description": "Payload for a general check in not associated with an event."
+      },
+      "DietaryPreference": {
+        "type": "string",
+        "enum": [
+          "vegetarian",
+          "vegan",
+          "gluten_free",
+          "dairy_free",
+          "halal",
+          "kosher",
+          "other"
+        ],
+        "title": "DietaryPreference",
+        "description": "Defines various options for dietary preferences."
+      },
+      "EventCreationType": {
+        "type": "string",
+        "enum": [
+          "manual",
+          "synced",
+          "system"
+        ],
+        "title": "EventCreationType",
+        "description": "Defines how an event was created."
+      },
+      "EventResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "event_name": {
+            "type": "string",
+            "title": "Event Name"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EventStatus"
+          },
+          "publish": {
+            "type": "boolean",
+            "title": "Publish"
+          },
+          "creation_type": {
+            "$ref": "#/components/schemas/EventCreationType"
+          },
+          "external_calender_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "External Calender Id"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_by": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Updated By"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "event_name",
+          "status",
+          "publish",
+          "creation_type",
+          "created_by",
+          "created_at",
+          "updated_by",
+          "updated_at"
+        ],
+        "title": "EventResponse",
+        "description": "Response for a created event."
+      },
+      "EventStatus": {
+        "type": "string",
+        "enum": [
+          "active",
+          "ended",
+          "canceled"
+        ],
+        "title": "EventStatus",
+        "description": "Defines an event's status."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "TokenResponse": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token"
+        ],
+        "title": "TokenResponse",
+        "description": "Access token issued after succesful login or sign up."
+      },
+      "UpdateCheckInRequest": {
+        "properties": {
+          "visitor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Visitor Name"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "meal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meal"
+          },
+          "dietary_preferences": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/DietaryPreference"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dietary Preferences"
+          },
+          "allergies": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allergies"
+          }
+        },
+        "type": "object",
+        "title": "UpdateCheckInRequest",
+        "description": "Payload for checking in at the TBI."
+      },
+      "UpdateEventRequest": {
+        "properties": {
+          "event_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Event Name"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Date"
+          },
+          "publish": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Publish"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EventStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "title": "UpdateEventRequest",
+        "description": "Payload for creating an event."
+      },
+      "UpdateProfileRequest": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "title": "UpdateProfileRequest",
+        "description": "Payload for updating the authenticated user profile."
+      },
+      "UserLoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "UserLoginRequest",
+        "description": "Payload for logging into myTBI."
+      },
+      "UserProfile": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "type": "string",
+            "title": "Last Name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "role": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserRole"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "last_logged_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Logged At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "first_name",
+          "last_name",
+          "email"
+        ],
+        "title": "UserProfile",
+        "description": "Represents the authonticated user profile."
+      },
+      "UserRole": {
+        "type": "string",
+        "enum": [
+          "coordinator"
+        ],
+        "title": "UserRole",
+        "description": "Role a use holds when accessing role-based features."
+      },
+      "UserSignUpRequest": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "type": "string",
+            "title": "Last Name"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name",
+          "email",
+          "password"
+        ],
+        "title": "UserSignUpRequest",
+        "description": "Payload for signing up into myTBI."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Operations",
+      "description": "Health check and openrational endpoints for the service."
+    },
+    {
+      "name": "Authentication",
+      "description": "Sign-up, login, and token issuance."
+    },
+    {
+      "name": "Authenticated User",
+      "description": "Authenticated user profile access and updates."
+    },
+    {
+      "name": "Admin Tools",
+      "description": "Coordinator-only management."
+    },
+    {
+      "name": "Check In",
+      "description": "Visitor-facing event listings and check-in submission."
+    }
+  ]
+}
