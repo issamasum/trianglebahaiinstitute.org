@@ -1,0 +1,42 @@
+<section class="hero">
+  <h1>
+    <span class="hero-lead">Welcome to myTBI</span>
+  </h1>
+  <p class="hero-sub">
+    The all-in-one platform for check-in, accessing the library, and managing facility usage.
+  </p>
+  <div class="hero-actions">
+    <a mat-flat-button class="tbi-action-button" [routerLink]="routes.checkIn">Check in at TBI</a>
+    <a
+      mat-stroked-button
+      class="btn-secondary"
+      [routerLink]="routes.home"
+      [fragment]="featuresFragment"
+    >
+      Browse features
+    </a>
+  </div>
+</section>
+
+<section class="features" [id]="featuresFragment">
+  <h2>Everything you need to succeed</h2>
+  <p class="features-sub">
+    Useful features designed to help you use the Triangle Baha'i Institute Facility meaningfully.
+  </p>
+
+  <div class="feature-grid">
+    @for (f of features; track f.title) {
+      <a class="card-link" [routerLink]="f.route">
+        <mat-card class="feature-card" [class]="f.theme" appearance="raised">
+          <mat-card-content>
+            <div class="icon-wrap">
+              <mat-icon>{{ f.icon }}</mat-icon>
+            </div>
+            <h3>{{ f.title }}</h3>
+            <p>{{ f.description }}</p>
+          </mat-card-content>
+        </mat-card>
+      </a>
+    }
+  </div>
+</section>

@@ -1,0 +1,25 @@
+<mat-toolbar class="header">
+  <a class="brand" [routerLink]="routes.home">MyTBI</a>
+
+  <nav class="nav" aria-label="Primary">
+    @for (link of navLinks; track link.label) {
+      <a mat-button [routerLink]="link.route" [fragment]="link.fragment">{{ link.label }}</a>
+    }
+  </nav>
+
+  <button mat-flat-button class="account-btn" [routerLink]="routes.signIn">Sign in</button>
+</mat-toolbar>
+
+<main class="content">
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <a mat-flat-button class="btn-contact" [routerLink]="routes.contact">Contact</a>
+  <p class="legal-links">
+    @for (link of footerLinks; track link.label) {
+      <a [routerLink]="link.route">{{ link.label }}</a>
+    }
+  </p>
+  <p>All rights reserved</p>
+</footer>

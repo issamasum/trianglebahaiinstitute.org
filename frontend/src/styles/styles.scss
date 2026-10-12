@@ -4,20 +4,54 @@
 @include mat.elevation-classes();
 @include mat.app-background();
 
+// Light mode (default)
+html {
+  @include mat.theme(
+    (
+      color: (
+        theme-type: light,
+        primary: $primary-palette,
+        tertiary: $tertiary-palette,
+      ),
+      typography: Inter,
+      density: 0,
+    )
+  );
+}
+
+// TBI color tokens
+
 @mixin tbi-token {
   --app-link-color: #bbd15b;
   --app-link-hover: #8c9563;
   --app-shell-edge: rgb(138, 150, 112, 0.12);
   --app-card-shadow: 0 18px 36px -28px rgba(19, 41, 75, 0.4);
-}
 
+  --ink: var(--mat-sys-on-background);
+  --ink-soft: var(--mat-sys-on-surface-variant);
+  --surface: var(--mat-sys-surface);
+
+  --brand-dark: var(--mat-sys-primary);
+  --action-green: var(--mat-sys-tertiary);
+
+  // Feature card colors
+  --lime: var(--mat-sys-primary-container);
+  --gold: #ecd24a;
+  --olive: #d3c45c;
+}
 :root {
   @include tbi-token();
 }
 
-// ---------------------------------------------------------------------------
-// Global base styles
-// ---------------------------------------------------------------------------
+.tbi-action-button {
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--mat-sys-tertiary),
+      filled-label-text-color: var(--mat-sys-on-tertiary),
+    )
+  );
+}
+
 *:focus-visible {
   outline: 3px solid var(--mat-sys-primary);
   outline-offset: 2px;

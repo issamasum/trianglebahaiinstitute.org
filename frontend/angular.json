@@ -26,13 +26,8 @@
               }
             ],
             "styles": ["src/styles/styles.scss", "src/styles/tailwind.css"],
-            "server": "src/main.server.ts",
-            "outputMode": "server",
             "security": {
               "allowedHosts": []
-            },
-            "ssr": {
-              "entry": "src/server.ts"
             }
           },
           "configurations": {
@@ -57,8 +52,8 @@
               "sourceMap": true,
               "fileReplacements": [
                 {
-                 "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.development.ts" 
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.development.ts"
                 }
               ]
             }
@@ -85,7 +80,7 @@
           "builder": "@angular/build:unit-test",
           "options": {
             "tsConfig": "tsconfig.spec.json",
-            "runnerConfig": "vitest.config,ts"
+            "runnerConfig": "vitest.config.ts"
           },
           "configurations": {
             "ci": {

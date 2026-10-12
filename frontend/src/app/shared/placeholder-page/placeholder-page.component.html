@@ -1,0 +1,17 @@
+<section class="placeholder-page">
+  <p class="eyebrow">{{ data().eyebrow ?? 'Coming Soon' }}</p>
+  <h1>{{ data().title ?? 'This page is on the way' }}</h1>
+  <p class="description">
+    {{
+      data().description ??
+        'We are still building this part of MyTBI. Please check back soon while we finish it.'
+    }}
+  </p>
+
+  <div class="actions">
+    <a mat-flat-button class="tbi-action-button" [routerLink]="data().ctaRoute ?? routes.home">
+      {{ data().ctaLabel ?? 'Back to home' }}
+    </a>
+    <a mat-stroked-button [routerLink]="routes.home">Explore myTBI</a>
+  </div>
+</section>

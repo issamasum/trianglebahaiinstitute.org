@@ -1,5 +1,5 @@
 /** Runtime evnvironemnt setting for the application. */
 
-export const evnvironemnt = {
+export const environment = {
   production: true,
 };
