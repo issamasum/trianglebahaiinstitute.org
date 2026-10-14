@@ -8,13 +8,23 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
 from trianglebahaiinstitute.config import (
+    DEFAULT_JWT_SECRET,
     ENV_FILE_NAME,
     Settings,
     find_env_file,
     get_settings,
 )
+
+
+@pytest.fixture
+def clean_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Isolates Settings from real .env file and environment variables."""
+    monkeypatch.chdir(tmp_path)
+    for name in ("ENVIRONMENT", "DATABASE_URL", "JWT_SECRET"):
+        monkeypatch.delenv(name, raising=False)
 
 
 def build_settings(**overrides: Any) -> Settings:
@@ -175,3 +185,60 @@ def test_settings_allow_missing_env_file_outside_development(
 
     # Assert
     assert settings.environment == "test"
+
+
+def test_production_requires_database_url(clean_env: None) -> None:
+    # Act / Assert
+    with pytest.raises(ValidationError, match="DATABASE_URL must be set"):
+        Settings(environment="production", jwt_secret="x" * 32)
+
+
+def test_production_rejects_default_jwt_secret(clean_env: None) -> None:
+    # Act / Assert
+    with pytest.raises(ValidationError, match="JWT_SECRET must be overridden"):
+        Settings(environment="production", database_url="postgresql://u:p@h/db")
+
+
+def test_production_accepts_explicit_required_settings(clean_env: None) -> None:
+    # Act
+    settings = Settings(
+        environment="production",
+        database_url="postgresql://u:p@h/db",
+        jwt_secret="x" * 32,
+    )
+
+    # Assert
+    assert settings.is_production
+
+
+@pytest.mark.parametrize(
+    "raw_url",
+    ["postgres://u:p@h:5432/db", "postgresql://u:p@h:5432/db"],
+)
+def test_database_url_is_rewritten_to_psycopg_driver(
+    clean_env: None, raw_url: str
+) -> None:
+    # Act
+    settings = Settings(environment="test", database_url=raw_url)
+
+    # Assert
+    assert settings.database_url == "postgresql+psycopg://u:p@h:5432/db"
+
+
+def test_database_url_with_explicit_driver_is_unchanged(clean_env: None) -> None:
+    # Arrange
+    url = "postgresql+psycopg://u:p@h:5432/db"
+
+    # Act
+    settings = Settings(environment="test", database_url=url)
+
+    # Assert
+    assert settings.database_url == url
+
+
+def test_development_and_test_allow_default_secrets(clean_env: None) -> None:
+    # Act
+    settings = Settings(environment="test")
+
+    # Assert
+    assert settings.jwt_secret == DEFAULT_JWT_SECRET

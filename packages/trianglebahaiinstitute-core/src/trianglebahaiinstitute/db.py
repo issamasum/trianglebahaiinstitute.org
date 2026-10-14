@@ -1,4 +1,3 @@
-# Copyright (c) 2026 Kris Jordan
 # Copyright (c) 2026 Issa Masumbuko
 # SPDX-License-Identifier: MIT
 
@@ -7,17 +6,35 @@
 from collections.abc import Callable, Generator
 from functools import lru_cache
 from importlib import import_module
+from pathlib import Path
 from typing import TypeAlias
 
+from alembic import command
+from alembic.config import Config
 from sqlalchemy import text
 from sqlalchemy.engine import URL, make_url
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 
 from trianglebahaiinstitute.config import get_settings
 
 AfterCommitCallback: TypeAlias = Callable[[], None]
 
 _AFTER_COMMIT_CALLBACKS_KEY = "after_commit_callbacks"
+
+_ALEMBIC_INI = Path(__file__).resolve().parents[2] / "alembic.ini"
+
+
+def run_migrations(revision: str = "head") -> None:
+    """Runs Alembic migrations to the specified revision.
+
+    Args:
+        revision: Alembic revision identifier. Defaults to "head" (latest).
+    """
+    alembic_cfg = Config(str(_ALEMBIC_INI))
+    alembic_cfg.set_main_option(
+        "sqlalchemy.url", get_settings().effective_database_url.replace("%", "%%")
+    )
+    command.upgrade(alembic_cfg, revision)
 
 
 @lru_cache
@@ -31,12 +48,6 @@ def get_engine():
     )
 
 
-def create_db_and_tables() -> None:
-    """Creates all configured database tables."""
-    load_table_metadata()
-    SQLModel.metadata.create_all(get_engine())
-
-
 def load_table_metadata() -> None:
     """Imports SQLModel table modules so their metadata is registered."""
     import_module("trianglebahaiinstitute.tables")
@@ -47,15 +58,21 @@ def reset_db_and_tables() -> None:
     """Drops and recreates the configured database, then creates all tables.
 
     PostgreSQL databases are dropped and recreated from the admin ``postgres``
-    database. File-backed SQLite databases are deleted and rebuilt. In-memory
-    SQLite databases are reset by dropping and recreating tables.
+    database.
 
     Raises:
         ValueError: If the configured database driver is unsupported or the
-            database URL does not include a database name.
+            database URL does not include a database name; or database reset is ran in production.
     """
+    settings = get_settings()
+
+    if not (settings.is_development or settings.is_test):
+        raise RuntimeError(
+            "Database reset is only allowed in development or test environments."
+        )
+
     engine = get_engine()
-    database_url = make_url(get_settings().effective_database_url)
+    database_url = make_url(settings.effective_database_url)
 
     if database_url.drivername.startswith("postgresql"):
         engine.dispose()
@@ -66,7 +83,7 @@ def reset_db_and_tables() -> None:
         )
 
     get_engine.cache_clear()
-    create_db_and_tables()
+    run_migrations()
 
 
 def _reset_postgresql_database(database_url: URL) -> None:

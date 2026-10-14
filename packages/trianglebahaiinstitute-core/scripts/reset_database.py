@@ -14,11 +14,11 @@ application is immediately usable for local development and end-to-end tests:
 
 import sys
 
-import trianglebahaiinstitute.tables  # noqa: F401
+from sqlmodel import Session
+
 from trianglebahaiinstitute.config import Settings
 from trianglebahaiinstitute.db import get_engine, reset_db_and_tables
 from trianglebahaiinstitute.dev_data import seed
-from sqlmodel import Session
 
 
 def main() -> None:

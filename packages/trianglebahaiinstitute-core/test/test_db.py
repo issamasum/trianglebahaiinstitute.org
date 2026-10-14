@@ -7,6 +7,8 @@ from __future__ import annotations
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from trianglebahaiinstitute import db
 
 
@@ -63,27 +65,6 @@ def test_get_engine_returns_cached_engine() -> None:
     )
 
 
-def test_create_db_and_tables_uses_cached_engine() -> None:
-    # Arrange
-    expected_engine = object()
-
-    # Act
-    with (
-        patch(
-            "trianglebahaiinstitute.db.load_table_metadata"
-        ) as load_table_metadata_mock,
-        patch("trianglebahaiinstitute.db.get_engine", return_value=expected_engine),
-        patch(
-            "trianglebahaiinstitute.db.SQLModel.metadata.create_all"
-        ) as create_all_mock,
-    ):
-        db.create_db_and_tables()
-
-    # Assert
-    load_table_metadata_mock.assert_called_once_with()
-    create_all_mock.assert_called_once_with(expected_engine)
-
-
 def test_load_table_metadata_imports_tables_package() -> None:
     # Act
     with patch("trianglebahaiinstitute.db.import_module") as import_module_mock:
@@ -97,12 +78,16 @@ def test_load_table_metadata_imports_tables_package() -> None:
     )
 
 
-def test_reset_db_and_tables_resets_postgresql_database_and_recreates_tables() -> None:
+def test_reset_db_and_tables_resets_postgresql_database_and_applies_migrations() -> (
+    None
+):
     # Arrange
     expected_settings = SimpleNamespace(
         effective_database_url=(
             "postgresql+psycopg://postgres:postgres@postgres:5432/trianglebahaiinstitute"
-        )
+        ),
+        is_development=True,
+        is_test=False,
     )
     engine = MagicMock()
 
@@ -113,22 +98,79 @@ def test_reset_db_and_tables_resets_postgresql_database_and_recreates_tables() -
         patch(
             "trianglebahaiinstitute.db._reset_postgresql_database"
         ) as reset_postgres_mock,
-        patch(
-            "trianglebahaiinstitute.db.create_db_and_tables"
-        ) as create_db_and_tables_mock,
+        patch("trianglebahaiinstitute.db.run_migrations") as run_migration_mock,
     ):
         db.reset_db_and_tables()
 
     # Assert
     engine.dispose.assert_called_once_with()
     reset_postgres_mock.assert_called_once()
-    create_db_and_tables_mock.assert_called_once_with()
+    run_migration_mock.assert_called_once_with()
+
+
+def test_reset_db_and_tables_refuses_to_run_in_production() -> None:
+    # Arrange
+    production_settings = SimpleNamespace(
+        effective_database_url="postgresql+psycopg://u:p@host:5432/prod",
+        is_development=False,
+        is_test=False,
+    )
+
+    # Act / Assert
+    with (
+        patch(
+            "trianglebahaiinstitute.db.get_settings", return_value=production_settings
+        ),
+        patch("trianglebahaiinstitute.db.get_engine") as get_engine_mock,
+        patch(
+            "trianglebahaiinstitute.db._reset_postgresql_database"
+        ) as reset_postgres_mock,
+    ):
+        with pytest.raises(RuntimeError, match="only allowed in development or test"):
+            db.reset_db_and_tables()
+
+    # Nothing destructive should have been attempted
+    get_engine_mock.assert_not_called()
+    reset_postgres_mock.assert_not_called()
+
+
+def test_run_migrations_upgrades_to_head() -> None:
+    # Arrange
+    config = MagicMock()
+
+    # Act
+    with (
+        patch("trianglebahaiinstitute.db.Config", return_value=config) as config_mock,
+        patch("trianglebahaiinstitute.db.command.upgrade") as upgrade_mock,
+    ):
+        db.run_migrations()
+
+    # Assert
+    config_mock.assert_called_once_with(str(db._ALEMBIC_INI))
+    upgrade_mock.assert_called_once_with(config, "head")
+
+
+def test_run_migrations_accepts_target_revision() -> None:
+    # Arrange
+    config = MagicMock()
+
+    # Act
+    with (
+        patch("trianglebahaiinstitute.db.Config", return_value=config),
+        patch("trianglebahaiinstitute.db.command.upgrade") as upgrade_mock,
+    ):
+        db.run_migrations("abc123")
+
+    # Assert
+    upgrade_mock.assert_called_once_with(config, "abc123")
 
 
 def test_reset_db_and_tables_raises_for_unsupported_driver() -> None:
     # Arrange
     expected_settings = SimpleNamespace(
-        effective_database_url="mysql://user:pass@localhost:3306/trianglebahaiinstitute"
+        effective_database_url="mysql://user:pass@localhost:3306/trianglebahaiinstitute",
+        is_development=True,
+        is_test=False,
     )
 
     # Act / Assert

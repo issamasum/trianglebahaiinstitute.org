@@ -1,4 +1,3 @@
-# Copyright (c) 2026 Kris Jordan
 # Copyright (c) 2026 Issa Masumbuko
 # SPDX-License-Identifier: MIT
 
@@ -6,7 +5,7 @@ import sys
 
 import trianglebahaiinstitute.tables  # noqa: F401
 from trianglebahaiinstitute.config import Settings
-from trianglebahaiinstitute.db import create_db_and_tables
+from trianglebahaiinstitute.db import run_migrations
 
 settings = Settings()
 
@@ -16,5 +15,5 @@ if settings.environment != "development":
     exit(1)
 
 
-create_db_and_tables()
-print("Created Database and Tables")
+run_migrations()
+print("Ran migrations to the latest revision.")
